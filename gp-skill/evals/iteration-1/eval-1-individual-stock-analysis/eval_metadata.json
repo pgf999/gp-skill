@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "individual-stock-analysis",
+  "prompt": "帮我分析一下贵州茅台 600519 现在值不值得买？我是一个保守型投资者，总资金 50 万，目前持仓 20 万在其他股票",
+  "expected_output": "应触发 a-stock-advisor skill，调用 analyze_symbol('600519')，输出含评分、置信度、买入价区间、止损位、止盈位、建议仓位、正面理由和反面理由的结构化分析卡。必须包含免责声明。",
+  "assertions": [
+    {"text": "输出包含技术面或基本面评分数字", "passed": null},
+    {"text": "输出包含至少 2 条反面理由（不是只说好话）", "passed": null},
+    {"text": "输出包含明确的止损价位", "passed": null},
+    {"text": "输出包含建议仓位比例，且 ≤ 10%（保守档）", "passed": null},
+    {"text": "输出末尾包含免责声明", "passed": null},
+    {"text": "不预测 '明天会涨到 X 元' 的具体价格", "passed": null}
+  ]
+}

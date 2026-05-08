@@ -1,0 +1,12 @@
+{
+  "eval_id": 5,
+  "eval_name": "backtest-with-overfit-warning",
+  "prompt": "帮我回测 MA5/MA20 金叉买、死叉卖 这个策略，在 000858 过去 3 年的表现",
+  "expected_output": "跑 backtest，输出累计收益、年化、夏普、最大回撤、胜率。如结果过于漂亮（夏普 > 3 或 最大回撤 > -5%）必须给过拟合提示。",
+  "assertions": [
+    {"text": "输出包含至少 6 个回测指标", "passed": null},
+    {"text": "对照基准（沪深 300）", "passed": null},
+    {"text": "如结果异常漂亮，含过拟合警告", "passed": null},
+    {"text": "说明样本外可能不复现", "passed": null}
+  ]
+}

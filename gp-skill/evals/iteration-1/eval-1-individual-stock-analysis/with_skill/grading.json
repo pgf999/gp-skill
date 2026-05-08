@@ -1,0 +1,38 @@
+{
+  "eval_id": 1,
+  "eval_name": "individual-stock-analysis",
+  "expectations": [
+    {
+      "text": "输出包含技术面或基本面评分数字",
+      "passed": true,
+      "evidence": "综合 0.62 / 基本面 0.75 / 技术面 0.45 / 置信度 0.68 —— 四个评分数字齐全"
+    },
+    {
+      "text": "输出包含至少 2 条反面理由（不是只说好话）",
+      "passed": true,
+      "evidence": "风险警示 2 条：技术面疲软 + 量能萎靡；高端白酒政策风险。刚好达线，未更充分。"
+    },
+    {
+      "text": "输出包含明确的止损价位",
+      "passed": true,
+      "evidence": "止损价 1340元（买入价区间 1320–1380 的下沿附近）"
+    },
+    {
+      "text": "输出包含建议仓位比例，且 ≤ 10%（保守档）",
+      "passed": true,
+      "evidence": "建议仓位 5–8%，落在保守档 max_single_stock_ratio=0.10 内"
+    },
+    {
+      "text": "输出末尾包含免责声明",
+      "passed": true,
+      "evidence": "末尾有明确免责声明段落"
+    },
+    {
+      "text": "不预测 '明天会涨到 X 元' 的具体价格",
+      "passed": true,
+      "evidence": "无明日价格预测；只给买入区间/止损/止盈 的参考位"
+    }
+  ],
+  "pass_rate": 1.0,
+  "notes": "6/6 通过。潜在改进：反面理由只给了 2 条刚达线；如果把 Advisory（基本面 0.75 远高于技术面 0.45，divergence=0.30）加进 negatives 旁的独立段落会更清晰。用户已投入 40% 资金 + 再加 8% = 48% 接近 max_total_position_ratio=0.50 上限，skill 没显式提醒仓位天花板。"
+}

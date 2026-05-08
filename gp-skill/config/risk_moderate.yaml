@@ -1,0 +1,74 @@
+# 稳健型风控预设
+
+meta:
+  preset: "moderate"
+  description: "Balanced. More opportunities, more draw-down tolerance."
+  last_updated: "2026-04-22"
+
+account:
+  total_capital: 100000
+  reserved_cash: 5000
+  max_single_trade: 15000
+
+position:
+  max_single_stock_ratio: 0.20
+  max_sector_ratio: 0.40
+  max_total_position_ratio: 0.80
+
+stop_loss:
+  absolute_stop_loss: -0.07
+  trailing_stop_loss: -0.10
+  take_profit: 0.20
+
+trade_limits:
+  max_daily_trades: 5
+  cooldown_minutes: 10
+  max_consecutive_up_days_allowed: 4
+  min_float_mcap: 5000000000      # 流通市值 >= 50 亿
+
+data_source:
+  backends:
+    - tushare
+    - mootdx
+    - akshare-east
+    - akshare-sina
+  cache:
+    duckdb_path: "data/cache/market.duckdb"
+    enabled: true
+  sync:
+    universes: ["watchlist", "hs300", "zz500"]
+    schedule_hint: "19:00 工作日"
+
+boards:
+  allow_sh_main: true
+  allow_sz_main: true
+  allow_chinext: true
+  allow_star: true
+  allow_bj: false
+
+fundamentals_filter:
+  min_roe_5y_avg: 5.0
+  max_debt_ratio: 70.0
+  min_gross_margin: 10.0
+  exclude_consecutive_loss_years: 2
+
+fees:
+  commission_rate: 0.00025
+  commission_min: 5.0
+  stamp_tax_rate: 0.0005
+  transfer_fee_rate: 0.00001
+
+signals:
+  strong_buy_threshold: 0.72
+  buy_threshold: 0.55
+  sell_threshold: 0.42
+  strong_sell_threshold: 0.28
+  weights:
+    technical: 0.50
+    fundamental: 0.50
+
+trade:
+  execution_mode: "paper"
+  broker: null
+  require_confirmation: true
+  confirmation_word: "确认"

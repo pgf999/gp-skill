@@ -1,0 +1,76 @@
+# 激进型风控预设 —— 不建议首次使用者选择
+# 含小盘股、科创板、更高仓位、更宽松止损
+
+meta:
+  preset: "aggressive"
+  description: "High-risk, high-return. Only use if you can afford to lose."
+  last_updated: "2026-04-22"
+  warning: "本档位允许更激进的仓位与更高波动的标的，历史上散户在激进档的平均收益并不优于稳健档"
+
+account:
+  total_capital: 100000
+  reserved_cash: 2000
+  max_single_trade: 20000
+
+position:
+  max_single_stock_ratio: 0.30
+  max_sector_ratio: 0.50
+  max_total_position_ratio: 1.00
+
+stop_loss:
+  absolute_stop_loss: -0.10
+  trailing_stop_loss: -0.12
+  take_profit: 0.30
+
+trade_limits:
+  max_daily_trades: 10
+  cooldown_minutes: 5
+  max_consecutive_up_days_allowed: 6
+  min_float_mcap: 0                # 不限流通市值
+
+data_source:
+  backends:
+    - tushare
+    - mootdx
+    - akshare-east
+    - akshare-sina
+  cache:
+    duckdb_path: "data/cache/market.duckdb"
+    enabled: true
+  sync:
+    universes: ["watchlist", "hs300", "zz500"]
+    schedule_hint: "19:00 工作日"
+
+boards:
+  allow_sh_main: true
+  allow_sz_main: true
+  allow_chinext: true
+  allow_star: true
+  allow_bj: true
+
+fundamentals_filter:
+  min_roe_5y_avg: 0.0              # 不硬性要求
+  max_debt_ratio: 80.0
+  min_gross_margin: 5.0
+  exclude_consecutive_loss_years: 1
+
+fees:
+  commission_rate: 0.00025
+  commission_min: 5.0
+  stamp_tax_rate: 0.0005
+  transfer_fee_rate: 0.00001
+
+signals:
+  strong_buy_threshold: 0.70
+  buy_threshold: 0.52
+  sell_threshold: 0.45
+  strong_sell_threshold: 0.30
+  weights:
+    technical: 0.60                # 技术面主导
+    fundamental: 0.40
+
+trade:
+  execution_mode: "paper"          # 再激进，实盘也要显式开启
+  broker: null
+  require_confirmation: true
+  confirmation_word: "确认"

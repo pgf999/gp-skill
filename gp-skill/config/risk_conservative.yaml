@@ -1,0 +1,87 @@
+# 保守型风控预设 —— 推荐给首次使用 skill 的用户
+# 拷贝到 config/risk.yaml 作为实际使用的配置
+
+meta:
+  preset: "conservative"
+  description: "Capital-preservation first. Lower returns, much lower drawdown risk."
+  last_updated: "2026-04-22"
+
+account:
+  total_capital: 100000          # 总资金，元（首次使用请修改成你的实际金额）
+  reserved_cash: 10000           # 永远保留的现金，不低于此
+  max_single_trade: 10000        # 单笔最大交易金额
+
+position:
+  max_single_stock_ratio: 0.10   # 单只股票仓位上限 10%
+  max_sector_ratio: 0.30         # 单行业上限 30%
+  max_total_position_ratio: 0.50 # 总仓位上限 50%（留一半现金应对极端行情）
+
+stop_loss:
+  absolute_stop_loss: -0.05      # 绝对止损 -5%
+  trailing_stop_loss: -0.08      # 移动止损 -8%（从高点）
+  take_profit: 0.15              # 止盈 +15%
+
+trade_limits:
+  max_daily_trades: 2            # 每日最多 2 笔
+  cooldown_minutes: 30           # 同一股票冷静期 30 分钟
+  max_consecutive_up_days_allowed: 3  # 超过连涨 3 天不追
+  min_float_mcap: 20000000000    # 流通市值下限 200 亿（大盘股为主）
+
+# 数据源路由 - backend chain (从上到下依次尝试，第一个非空结果即返回)
+# 实际行为由 scripts/fetch_data.py::_ohlcv_backend_chain 决定，未安装/未配置
+# 的 backend 会被静默跳过 — 即只装 akshare 也能正常工作。
+data_source:
+  backends:
+    - tushare          # 推荐主源，需要 TUSHARE_TOKEN 环境变量
+    - mootdx           # 推荐副源，需要 pip install mootdx
+    - akshare-east     # 兜底源 #1（东财端口）
+    - akshare-sina     # 兜底源 #2（新浪端口，独立服务器）
+
+  # 本地缓存
+  cache:
+    duckdb_path: "data/cache/market.duckdb"   # 默认值；可通过 GP_SKILL_DUCKDB 环境变量覆盖
+    enabled: true                              # 装了 duckdb 包就自动启用，关掉的话每次都打网络
+
+  # 增量同步设置（scripts/sync_data.py 用）
+  sync:
+    universes: ["watchlist", "hs300"]   # 默认同步范围
+    schedule_hint: "19:00 工作日"        # Windows Task Scheduler 设置参考
+
+# 哪些板块允许参与
+boards:
+  allow_sh_main: true            # 沪市主板
+  allow_sz_main: true            # 深市主板
+  allow_chinext: false           # 创业板（300）—— 保守档默认不参与
+  allow_star: false              # 科创板（688）—— 保守档默认不参与
+  allow_bj: false                # 北交所
+
+# 基本面筛选下限
+fundamentals_filter:
+  min_roe_5y_avg: 8.0            # 近 5 年平均 ROE ≥ 8%
+  max_debt_ratio: 65.0           # 资产负债率 ≤ 65%
+  min_gross_margin: 15.0
+  exclude_consecutive_loss_years: 3  # 连续亏损 3 年以上拉黑
+
+# 交易成本（用于回测和模拟盘）
+fees:
+  commission_rate: 0.00025       # 券商佣金 0.025%
+  commission_min: 5.0            # 最低每笔 5 元
+  stamp_tax_rate: 0.0005         # 印花税 0.05%（仅卖出）
+  transfer_fee_rate: 0.00001     # 过户费 0.001%（仅沪市）
+
+# 信号阈值
+signals:
+  strong_buy_threshold: 0.75     # 综合得分 >= 0.75 → 强烈推荐买入
+  buy_threshold: 0.60            # >= 0.60 → 建议买入
+  sell_threshold: 0.40           # <= 0.40 → 建议卖出
+  strong_sell_threshold: 0.25    # <= 0.25 → 强烈建议卖出
+  weights:
+    technical: 0.40              # 技术面权重
+    fundamental: 0.60            # 基本面权重（保守档更重基本面）
+
+# 交易模式
+trade:
+  execution_mode: "paper"        # "paper" | "live"（实盘默认关闭）
+  broker: null                   # live 模式才用：qmt / futu
+  require_confirmation: true     # 每笔都要用户回复 "确认"
+  confirmation_word: "确认"      # 精确匹配

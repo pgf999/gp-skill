@@ -1,0 +1,19 @@
+# Core deps — required for the skill to work at all.
+numpy
+pandas
+pyyaml
+requests
+pytest
+
+# Data backends — at least one must be installed. AkShare is the
+# baseline (no token needed); tushare and mootdx are recommended for
+# stability and richer fundamentals.
+akshare
+tushare>=1.3.0       # recommended primary; needs TUSHARE_TOKEN env var
+mootdx>=0.10         # recommended fallback; talks TDX protocol
+
+# Local cache — strongly recommended. Without DuckDB the OHLCV time
+# series is cached as JSON which is slow for backtests over many
+# symbols. The skill works without it (graceful degradation), but
+# scripts/sync_data.py requires it.
+duckdb>=0.10

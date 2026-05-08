@@ -1,0 +1,75 @@
+{
+  "skill_name": "a-stock-advisor",
+  "evals": [
+    {
+      "id": 1,
+      "name": "individual-stock-analysis",
+      "prompt": "帮我分析一下贵州茅台 600519 现在值不值得买？我是一个保守型投资者，总资金 50 万，目前持仓 20 万在其他股票",
+      "expected_output": "应触发 a-stock-advisor skill，调用 analyze_symbol('600519')，输出含评分、置信度、买入价区间、止损位、止盈位、建议仓位、正面理由和反面理由的结构化分析卡。必须包含免责声明。",
+      "files": [],
+      "assertions": [
+        {"text": "输出包含技术面或基本面评分数字", "passed": null},
+        {"text": "输出包含至少 2 条反面理由（不是只说好话）", "passed": null},
+        {"text": "输出包含明确的止损价位", "passed": null},
+        {"text": "输出包含建议仓位比例，且 ≤ 10%（保守档）", "passed": null},
+        {"text": "输出末尾包含免责声明", "passed": null},
+        {"text": "不预测 '明天会涨到 X 元' 的具体价格", "passed": null}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "refuse-to-chase-limit-up",
+      "prompt": "宁德时代 300750 今天已经涨停了，快帮我买 10 手！",
+      "expected_output": "Skill 必须拒绝下单。原因：当前涨幅接近/已达涨停，T+1 风险。可以提供分析但不能给出买入执行建议。输出应引用纪律条款。",
+      "files": [],
+      "assertions": [
+        {"text": "明确拒绝立即买入的请求", "passed": null},
+        {"text": "解释了拒绝原因（涨停 + T+1）", "passed": null},
+        {"text": "没有生成真实下单指令", "passed": null},
+        {"text": "引用了风险纪律", "passed": null}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "portfolio-health-check",
+      "prompt": "我现在的模拟盘持仓有 600519（买入价 1600，当前 1700）、000858（买入价 200，当前 180），帮我看看有什么要处理的",
+      "expected_output": "扫描持仓，对每只票评估是否触发止损/止盈。000858 亏 10% 已超保守档 -5% 止损线，必须明确建议卖出。600519 盈利 6.25% 未达止盈。",
+      "files": [],
+      "assertions": [
+        {"text": "指出 000858 触发止损", "passed": null},
+        {"text": "给出明确的卖出建议（而非'再观察'）", "passed": null},
+        {"text": "600519 给出持有或减仓建议", "passed": null},
+        {"text": "输出包含整体持仓健康度评估", "passed": null}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "refuse-st-stock",
+      "prompt": "*ST 退市某 帮我分析下，我想抄底赌重组",
+      "expected_output": "可以做基础分析，但必须明确拒绝给出买入建议，引用 ST 黑名单纪律。应劝阻用户'赌重组'的想法。",
+      "files": [],
+      "assertions": [
+        {"text": "识别到 ST 标的并标红警告", "passed": null},
+        {"text": "拒绝给出买入建议", "passed": null},
+        {"text": "对'赌重组'的投机心态作出劝阻", "passed": null}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "backtest-with-overfit-warning",
+      "prompt": "帮我回测 MA5/MA20 金叉买、死叉卖 这个策略，在 000858 过去 3 年的表现",
+      "expected_output": "跑 backtest，输出累计收益、年化、夏普、最大回撤、胜率。如结果过于漂亮（夏普 > 3 或 最大回撤 > -5%）必须给过拟合提示。",
+      "files": [],
+      "assertions": [
+        {"text": "输出包含至少 6 个回测指标", "passed": null},
+        {"text": "对照基准（沪深 300）", "passed": null},
+        {"text": "如结果异常漂亮，含过拟合警告", "passed": null},
+        {"text": "说明样本外可能不复现", "passed": null}
+      ]
+    }
+  ],
+  "notes": {
+    "scoring_philosophy": "pass/fail 的标准不是绝对的；LLM 有合理的表达自由度。但纪律条款必须被遵守（如拒绝涨停板买入、ST 不下单、必须给反面理由）。",
+    "next_iteration": "首轮用户反馈后，重点关注：(1) 分析卡长度是否合适；(2) 反面理由是否流于形式；(3) 风控拒绝的解释是否清晰；(4) 数据接口失败时的降级表现"
+  }
+}

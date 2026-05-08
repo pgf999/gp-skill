@@ -1,0 +1,29 @@
+# Runtime-generated
+data/
+!data/.gitkeep
+
+# User's actual config (secrets + personal parameters)
+config/risk.yaml
+config/watchlist.yaml
+config/secrets.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Env vars
+.env
+
+# Claude Code local settings (machine-specific permissions, may contain paths)
+.claude/settings.local.json

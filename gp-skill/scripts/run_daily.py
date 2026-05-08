@@ -33,6 +33,7 @@ sys.path.insert(0, str(ROOT))
 from scripts._common import load_risk_config, load_watchlist, log, DATA_DIR
 from scripts import fetch_data, paper_trading, risk, signals, daily_report
 from scripts import universe_scanner
+from scripts.notify import send as notify_send, _md_to_html
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -380,6 +381,26 @@ def main():
 
     # 打印到终端（任务计划程序捕获）
     print(md)
+
+    # 发送通知（邮件 / 钉钉 / Telegram / Server 酱）
+    date_str = today.strftime("%Y-%m-%d")
+    ret_sign = "+" if report_data.get("portfolio", {}).get("total_return_pct", 0) >= 0 else ""
+    ret_pct  = report_data.get("portfolio", {}).get("total_return_pct", 0)
+    subject  = f"📊 A股虚拟盘日报 {date_str}  累计 {ret_sign}{ret_pct:.2f}%"
+    html_body = _md_to_html(md)
+    notify_result = notify_send(md, title=subject, html=html_body)
+
+    sent_via = [k for k, v in notify_result.items()
+                if v.get("enabled", True) and v.get("ok") is True]
+    if sent_via:
+        log.info("日报已推送: %s", sent_via)
+    else:
+        enabled = [k for k, v in notify_result.items() if v.get("enabled", True)]
+        if enabled:
+            errs = {k: notify_result[k].get("error") for k in enabled}
+            log.warning("推送失败: %s", errs)
+        else:
+            log.info("未配置推送渠道（在 .env 中设置 SMTP_* 可接收邮件）")
 
     log.info("=== run_daily done ===")
 
